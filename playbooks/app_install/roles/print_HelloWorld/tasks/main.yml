@@ -1,0 +1,5 @@
+---
+# tasks file for print_HelloWorld
+- name: Print Hello World
+  debug:
+    msg: "BES Ansible says, 'Hello World!'"

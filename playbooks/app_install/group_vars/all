@@ -1,0 +1,4 @@
+---
+## Variables listed here are applicable to all host groups
+
+date: "{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}"

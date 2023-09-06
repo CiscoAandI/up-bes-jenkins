@@ -1,0 +1,15 @@
+## YAML file
+---
+## If executing locally on a host:
+## ansible-playbook --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 bes_bed_git_repo.yml
+- hosts: all
+  become_user: root
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+
+  roles:
+    ## run_HelloWorld writes a file in the /tmp directory
+    #- run_HelloWorld
+    ## print_HelloWorld prints a STDOUT message only
+    - print_HelloWorld

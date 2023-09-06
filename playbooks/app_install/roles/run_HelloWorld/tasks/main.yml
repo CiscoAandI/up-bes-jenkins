@@ -1,0 +1,5 @@
+---
+- name: Create a file called '/tmp/testfile_{{ date }}.txt' with the content 'Hello World' on host {{ ansible_hostname }}
+  copy:
+    content: "Hello World\n"
+    dest: /tmp/testfile_{{ date }}.txt
