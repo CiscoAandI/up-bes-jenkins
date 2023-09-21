@@ -1,0 +1,80 @@
+---
+# Code modified only slightly from its original source:
+# https://wwwin-github.cisco.com/raw/SVS-Automation/jenkins-worker/master/playbooks/roles/04-docker/tasks/main.yml
+- name: Prepare Jenkins worker node with Docker installation
+  hosts: all
+  become: true
+  any_errors_fatal: true
+  gather_facts: true
+  tasks:
+    - name: Set Environment Variables for Proxy Use
+      set_fact:
+        http_proxy: "http://proxy.esl.cisco.com:80"
+        https_proxy: "http://proxy.esl.cisco.com:80"
+
+    - name: Uninstall Podman and Similar Packages
+      become: true
+      dnf:
+        state: absent
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - podman
+          - containers-common
+          - runc
+          - docker-ce-cli
+          - docker
+          - docker-ce
+          - containerd.io
+
+    - name: Set up the docker repository
+      become: true
+      yum_repository:
+        name: docker
+        description: docker repo
+        # Adding Centos as RHEL was giving errors
+        # TODO: RHEL8+ baseurl: https://download.docker.com/linux/rhel/$releasever/$basearch/stable
+        baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+        gpgcheck: true
+        gpgkey: https://download.docker.com/linux/centos/gpg
+
+    - name: Install Docker and Related Packages
+      become: true
+      dnf:
+        state: present
+        name: "{{ packages }}"
+      vars:
+        version_docker: "{{ docker_ver | default('23.0.6') }}"
+        packages:
+          - docker-ce-{{ version_docker }}
+          - docker-ce-cli-{{ version_docker }}
+          - containerd.io
+      register: docker_install
+
+    - name: Create docker group
+      become: true
+      group:
+        local: true
+        gid: 9000
+        name: docker
+        state: present
+
+    - name: Create Jenkins user and add to docker group
+      user:
+        name: jenkins
+        groups: docker
+        append: yes
+
+    - name: Start and Enable the Docker service
+      service:
+        name: docker
+        state: started
+        enabled: true
+        daemon_reload: yes
+      when: docker_install is changed
+
+    - name: Confirm Docker Installed and Version
+      shell: "docker --version"
+
+    - name: Check Docker Status
+      shell: "docker info"
