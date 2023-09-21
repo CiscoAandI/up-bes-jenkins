@@ -1,0 +1,15 @@
+---
+# vars file for docker_install
+# Which docker version should be installed
+docker_version: '23.0.6'
+# Which packages should be cleared out before installing docker
+package_removals:
+  - podman
+  - containers-common
+  - runc
+  - docker-ce-cli
+  - docker
+  - docker-ce
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin

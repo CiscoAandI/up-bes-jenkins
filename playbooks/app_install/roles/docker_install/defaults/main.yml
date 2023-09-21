@@ -1,0 +1,4 @@
+---
+# defaults file for docker_install
+http_proxy: "http://proxy.esl.cisco.com:80"
+https_proxy: "http://proxy.esl.cisco.com:80"

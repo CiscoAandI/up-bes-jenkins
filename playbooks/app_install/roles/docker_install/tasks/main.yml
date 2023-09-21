@@ -1,0 +1,74 @@
+---
+# tasks file for docker_install
+# Code modified only slightly from its original source:
+# https://wwwin-github.cisco.com/raw/SVS-Automation/jenkins-worker/master/playbooks/roles/04-docker/tasks/main.yml
+- name: Uninstall Podman and Similar Packages
+  become: true
+  dnf:
+    state: absent
+    name: "{{ packages }}"
+  vars:
+    packages:
+      "{{ package-removals }}"
+
+
+- name: Set up the docker repository using Centos since RHEL doesnt support docker OOB
+  become: true
+  yum_repository:
+    name: docker
+    description: docker repo
+    # Adding Centos as RHEL was giving errors
+    # See next commented out task for the RHEL link, which utilizes the same centos urls
+    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+    gpgcheck: true
+    gpgkey: https://download.docker.com/linux/centos/gpg
+  register: docker_repo_installed
+
+# This commented out task pruduces exactly the same result as the task above, deferring to the native
+# yum_repository module instead of the shell version below
+#    - name: Set up the docker repository for RHEL specific link instead of Centos
+#      become: true
+#      shell: |
+#        yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+#        sed -i 's~/rhel/~/centos/~g' /etc/yum.repos.d/docker-ce.repo
+
+- name: Install Docker and Related Packages
+  become: true
+  dnf:
+    state: present
+    name: "{{ packages }}"
+  vars:
+    version_docker: "{{ docker_version | default('23.0.6') }}"
+    packages:
+      - docker-ce-{{ version_docker }}
+      - docker-ce-cli-{{ version_docker }}
+      - containerd.io
+  register: docker_install
+
+- name: Create docker group
+  become: true
+  group:
+    local: true
+    gid: 9000
+    name: docker
+    state: present
+
+- name: Create Jenkins user and add to docker group
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
+
+- name: Start and Enable the Docker service
+  service:
+    name: docker
+    state: started
+    enabled: true
+    daemon_reload: yes
+  when: docker_install is changed
+
+- name: Confirm Docker Installed and Version
+  shell: "docker --version"
+
+- name: Check Docker Status
+  shell: "docker info"
