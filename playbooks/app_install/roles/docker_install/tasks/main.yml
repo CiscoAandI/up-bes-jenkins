@@ -9,7 +9,7 @@
     name: "{{ packages }}"
   vars:
     packages:
-      "{{ package-removals }}"
+      "{{ package_removals }}"
 
 
 - name: Set up the docker repository using Centos since RHEL doesnt support docker OOB
