@@ -12,4 +12,5 @@
     ## run_HelloWorld writes a file in the /tmp directory
     #- run_HelloWorld
     ## print_HelloWorld prints a STDOUT message only
+    - docker_install
     - print_HelloWorld
