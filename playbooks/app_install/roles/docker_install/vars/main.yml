@@ -1,15 +1,31 @@
 ---
 # vars file for docker_install
-# Which docker version should be installed
-docker_version: '23.0.6'
+docker_version: 24.0.6
+
 # Which packages should be cleared out before installing docker
 package_removals:
   - podman
   - containers-common
-  - runc
-  - docker-ce-cli
-  - docker
-  - docker-ce
+  - containerd
   - containerd.io
+  - runc
+  - docker
+  - docker-engine
+  - docker-ce
+  - docker-ce-cli
   - docker-buildx-plugin
   - docker-compose-plugin
+  - docker-client
+  - docker-client-latest
+  - docker-common
+  - docker-latest
+  - docker-latest-logrotate
+  - docker-logrotate
+
+# List the rpms to install. Should dervive from the unarchived tar.xz file
+package_installs:
+  - /tmp/containerd.io-1.6.24-3.1.el8.x86_64.rpm
+  - /tmp/docker-ce-24.0.6-1.el8.x86_64.rpm
+  - /tmp/docker-ce-cli-24.0.6-1.el8.x86_64.rpm
+  - /tmp/docker-buildx-plugin-0.11.2-1.el8.x86_64.rpm
+  - /tmp/docker-compose-plugin-2.21.0-1.el8.x86_64.rpm

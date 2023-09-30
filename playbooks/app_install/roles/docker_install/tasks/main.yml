@@ -11,39 +11,84 @@
     packages:
       "{{ package_removals }}"
 
+# - name: Set any Proxies required as set in vars.yml
+#   set-fact:
+#     - "{{ item }}": "{{ proxies[item] }}"
+#   with_items: "{{ proxies }}"
+      # "{{ proxies }}"
+#  when: len(proxies) > 0
 
-- name: Set up the docker repository using Centos since RHEL doesnt support docker OOB
+- name: Git checkout
+  ansible.builtin.git:
+    repo: https://github.com/CiscoAandI/up-bes-jenkins.git
+    dest: /tmp/docker_install
+    version: main
+    single_branch: yes
+  register: docker_bin_cloned
+
+# - name: Unpack Docker Binary files
+
+- name: Check if Git Checked out correctly
+  debug:
+    msg: "Docker Bin cloned {{ docker_bin_cloned }}"
+
+- name: Set Fact for path to docker binary xz file
+  set_fact:
+    docker_arch_path: "{{ playbook_dir }}/roles/docker_install/files/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.xz"
+
+- name: Check if Docker Archive defined correctly
+  debug:
+    msg: "Docker ARCHIVE {{ docker_arch_path }}"
+
+- name: Unarchive the xz file
+  unarchive:
+    # https://github.com/CiscoAandI/up-bes-jenkins/blob/BES-worker-docker-install/playbooks/app_install/roles/docker_install/files/docker-24.0.6.tar.xz
+    src: "{{ docker_arch_path }}"
+    dest: /tmp/
+    remote_src: no
+  # delegate_to: localhost
+  register: docker_bin_unarchived
+  when: docker_arch_path is defined
+
+- name: Check if Docker Unarchived correctly
+  debug:
+    msg: "Docker ARCHIVE {{ docker_bin_unarchived }}"
+
+
+- name: Install Docker and Related RPM Packages
+  any_errors_fatal: false
+  ignore_errors: true
   become: true
-  yum_repository:
-    name: docker
-    description: docker repo
-    # Adding Centos as RHEL was giving errors
-    # See next commented out task for the RHEL link, which utilizes the same centos urls
-    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
-    gpgcheck: true
-    gpgkey: https://download.docker.com/linux/centos/gpg
-  register: docker_repo_installed
-
-# This commented out task pruduces exactly the same result as the task above, deferring to the native
-# yum_repository module instead of the shell version below
-#    - name: Set up the docker repository for RHEL specific link instead of Centos
-#      become: true
-#      shell: |
-#        yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
-#        sed -i 's~/rhel/~/centos/~g' /etc/yum.repos.d/docker-ce.repo
-
-- name: Install Docker and Related Packages
-  become: true
-  dnf:
-    state: present
-    name: "{{ packages }}"
-  vars:
-    version_docker: "{{ docker_version | default('23.0.6') }}"
-    packages:
-      - docker-ce-{{ version_docker }}
-      - docker-ce-cli-{{ version_docker }}
-      - containerd.io
+  yum:
+    # state: latest
+    name: "{{ package_installs }}"
   register: docker_install
+
+
+#- name: Run shell command to Docker and Related RPM Packages
+#  shell: "rpm -ivh /tmp/*.rpm"
+#
+##
+#- name: yum Install from local repo
+#  shell: "yum install -y --cacheonly --disablerepo=* {{ docker_repo_root }}/yum/*.rpm"
+#  register: yum_install
+#
+#- name: dm Install from local repo
+#  shell: "yum install -y --cacheonly --disablerepo=* {{ docker_repo_root }}/dm/*.rpm"
+#  register: dm_install
+#
+#- name: lvm2 Install from local repo
+#  shell: "yum install -y --cacheonly --disablerepo=* {{ docker_repo_root }}/lvm2/*.rpm"
+#  register: lvm2_install
+#
+#- name: se Install from local repo
+#  shell: "yum install -y --cacheonly --disablerepo=* {{ docker_repo_root }}/se/*.rpm"
+#  register: se_install
+#
+#- name: docker Install from local repo
+#  shell: "yum install -y --cacheonly --disablerepo=* {{ docker_repo_root }}/docker/*.rpm"
+#  register: docker_install
+
 
 - name: Create docker group
   become: true
@@ -69,6 +114,3 @@
 
 - name: Confirm Docker Installed and Version
   shell: "docker --version"
-
-- name: Check Docker Status
-  shell: "docker info"
