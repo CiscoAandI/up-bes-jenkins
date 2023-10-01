@@ -27,5 +27,6 @@ package_installs:
   - /tmp/containerd.io-1.6.24-3.1.el8.x86_64.rpm
   - /tmp/docker-ce-24.0.6-1.el8.x86_64.rpm
   - /tmp/docker-ce-cli-24.0.6-1.el8.x86_64.rpm
+  - /tmp/docker-ce-rootless-extras-24.0.6-1.el8.x86_64
   - /tmp/docker-buildx-plugin-0.11.2-1.el8.x86_64.rpm
   - /tmp/docker-compose-plugin-2.21.0-1.el8.x86_64.rpm

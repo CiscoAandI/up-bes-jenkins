@@ -1,8 +1,2 @@
 ---
 # defaults file for docker_install.
-# Proxies may be necessary to reach certian resources
-proxies:
-  http_proxy: "http://proxy.esl.cisco.com:80"
-  https_proxy: "http://proxy.esl.cisco.com:80"
-  no_proxy: "127.0.0.1,::1,localhost,.cisco.com"
-
