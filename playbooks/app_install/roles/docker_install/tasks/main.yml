@@ -8,6 +8,17 @@
     state: absent
     name: "{{ package_removals }}"
 
+- name: Remove Any container images on system
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /var/lib/docker
+    - /var/lib/containers
+    - /var/lib/containerd
+    - /opt/containerd
+    # - /etc/docker  #  Might be unnecessary but if the daemon.json is defined it could interfere. Leaving alone for now
+
 - name: Set Fact for path to docker binary xz file
   ansible.builtin.set_fact:
     docker_arch_path: "{{ playbook_dir }}/roles/docker_install/files/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.xz"
