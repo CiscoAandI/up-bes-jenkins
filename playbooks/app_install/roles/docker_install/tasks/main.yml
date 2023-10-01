@@ -4,18 +4,15 @@
 # https://wwwin-github.cisco.com/raw/SVS-Automation/jenkins-worker/master/playbooks/roles/04-docker/tasks/main.yml
 - name: Uninstall Podman and Prior Docker Installations
   become: true
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     state: absent
-    name: "{{ packages }}"
-  vars:
-    packages:
-      "{{ package_removals }}"
+    name: "{{ package_removals }}"
 
 - name: Set Fact for path to docker binary xz file
   ansible.builtin.set_fact:
     docker_arch_path: "{{ playbook_dir }}/roles/docker_install/files/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.xz"
 
-- name: Unarchive the xz file
+- name: Unarchive the xz file containing the rpms to install
   ansible.builtin.unarchive:
     src: "{{ docker_arch_path }}"
     dest: /tmp/
@@ -25,7 +22,7 @@
 
 - name: Install Docker and Related RPM Packages
   become: true
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name: "{{ package_installs }}"
   register: docker_install
 
@@ -33,7 +30,6 @@
   become: true
   ansible.builtin.group:
     local: true
-    gid: 9000
     name: docker
     state: present
 
@@ -53,11 +49,10 @@
 
 - name: Remove rpm files and archive from tmp
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "/tmp/{{ item }}"
     state: absent
   with_items:
     - "{{ docker_rpms_unarchived.files }}"
-    - "{{ docker_arch_path }}"
 
 - name: Confirm Docker Installed and Version
   ansible.builtin.shell: "docker --version"
