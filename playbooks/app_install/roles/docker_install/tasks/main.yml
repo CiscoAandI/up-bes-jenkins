@@ -17,19 +17,62 @@
     - /var/lib/containers
     - /var/lib/containerd
     - /opt/containerd
-    # - /etc/docker  #  Might be unnecessary but if the daemon.json is defined it could interfere. Leaving alone for now
+    - /etc/docker
 
-- name: Set Fact for path to docker binary xz file
+- name: Set Fact for path to docker rpms gz file
   ansible.builtin.set_fact:
-    docker_arch_path: "{{ playbook_dir }}/roles/docker_install/files/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.xz"
+    docker_arch_path: "{{ playbook_dir }}/roles/docker_install/files/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.gz"
+  when: docker_rpm_src == 'local'
 
-- name: Unarchive the xz file containing the rpms to install
+
+- name: Set Fact for path to docker rpms gz file
+  ansible.builtin.set_fact:
+    docker_arch_path: "{{ artifact_path }}"
+    docker_arch_dest_path: "/tmp/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.gz"
+  when: docker_rpm_src == 'artifactory'
+
+
+- name: Create /etc/docker dir if not exist
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+
+- name: Touch /etc/docker/daemon.json if it doesnt exist or update mod time
+  ansible.builtin.file:
+    path: /etc/docker/daemon.json
+    state: touch
+    modification_time: preserve
+    access_time: preserve
+
+
+- name: Download docker_arch_path to the /tmp/ dir using no auth and no proxy
+  ansible.builtin.get_url:
+    url: "{{ artifact_path }}"
+    dest: "{{ docker_arch_dest_path }}"
+    mode: 0755
+    validate_certs: false
+    force: yes
+    timeout: 120
+    use_proxy: no
+    #url_username: "{{ artifactory_user }}"
+    #url_password: "{{ artifactory_password }}"
+    # basic_auth: yes
+    http_agent: "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0"
+    #headers:
+    #  Authorization: "Basic {{ artifactory_basic_auth }}"
+  when: docker_rpm_src == 'artifactory'
+
+- name: Unarchive the gz file containing the rpms to install
   ansible.builtin.unarchive:
-    src: "{{ docker_arch_path }}"
+    src: "{% if docker_rpm_src == 'local' %}{{ docker_arch_path }}{% else %}{{ docker_arch_dest_path }}{% endif %}"
+    # src: "{{ docker_arch_dest_path }}"
     dest: /tmp/
-    remote_src: no
+    remote_src: "{% if docker_rpm_src == 'local' %}no{% else %}yes{% endif %}"
     list_files: yes
   register: docker_rpms_unarchived
+  environment:
+    no_proxy: '*'
+
 
 - name: Install Docker and Related RPM Packages
   become: true
@@ -64,6 +107,9 @@
     state: absent
   with_items:
     - "{{ docker_rpms_unarchived.files }}"
+    - "{{ docker_arch_dest_path }}"
 
 - name: Confirm Docker Installed and Version
   ansible.builtin.shell: "docker --version"
+  register: docker_version_check
+
