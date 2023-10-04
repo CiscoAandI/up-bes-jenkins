@@ -19,7 +19,6 @@
     - /opt/containerd
     - /etc/docker
 
-
 - name: Set Fact for path to docker rpms gz file When pulling from Controller
   ansible.builtin.set_fact:
     docker_arch_path: "{{ playbook_dir }}/roles/docker_install/files/{{ docker_rpm_filename }}"
@@ -32,7 +31,6 @@
     docker_arch_dest_path: "/tmp/{{ docker_rpm_filename }}"
   when: docker_rpm_src == 'artifactory'
 
-# Since we cleared out the docker daomon if it existed, the systemctl script needs the daemon file to exist
 - name: Create /etc/docker dir if not exist
   ansible.builtin.file:
     path: /etc/docker
@@ -111,8 +109,6 @@
     - "{{ docker_rpms_unarchived.files }}"
     - "{{ docker_arch_dest_path }}"
 
-
 - name: Confirm Docker Installed and Version
   ansible.builtin.shell: "docker --version"
   register: docker_version_check
-
