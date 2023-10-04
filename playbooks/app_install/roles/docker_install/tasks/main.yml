@@ -2,8 +2,8 @@
 # tasks file for docker_install
 # Code modified from its original source:
 # https://wwwin-github.cisco.com/raw/SVS-Automation/jenkins-worker/master/playbooks/roles/04-docker/tasks/main.yml
+
 - name: Uninstall Podman and Prior Docker Installations
-  become: true
   ansible.builtin.package:
     state: absent
     name: "{{ package_removals }}"
@@ -19,41 +19,43 @@
     - /opt/containerd
     - /etc/docker
 
-- name: Set Fact for path to docker rpms gz file
+
+- name: Set Fact for path to docker rpms gz file When pulling from Controller
   ansible.builtin.set_fact:
-    docker_arch_path: "{{ playbook_dir }}/roles/docker_install/files/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.gz"
+    docker_arch_path: "{{ playbook_dir }}/roles/docker_install/files/{{ docker_rpm_filename }}"
+    docker_arch_dest_path: "/tmp/{{ docker_rpm_filename }}"
   when: docker_rpm_src == 'local'
 
-
-- name: Set Fact for path to docker rpms gz file
+- name: Set Fact for path to docker rpms gz file When pulling from Artifactory
   ansible.builtin.set_fact:
     docker_arch_path: "{{ artifact_path }}"
-    docker_arch_dest_path: "/tmp/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.gz"
+    docker_arch_dest_path: "/tmp/{{ docker_rpm_filename }}"
   when: docker_rpm_src == 'artifactory'
 
-
+# Since we cleared out the docker daomon if it existed, the systemctl script needs the daemon file to exist
 - name: Create /etc/docker dir if not exist
   ansible.builtin.file:
     path: /etc/docker
     state: directory
+    mode: 750
 
 - name: Touch /etc/docker/daemon.json if it doesnt exist or update mod time
   ansible.builtin.file:
     path: /etc/docker/daemon.json
     state: touch
+    mode: 740
     modification_time: preserve
     access_time: preserve
-
 
 - name: Download docker_arch_path to the /tmp/ dir using no auth and no proxy
   ansible.builtin.get_url:
     url: "{{ artifact_path }}"
     dest: "{{ docker_arch_dest_path }}"
-    mode: 0755
+    mode: 755
     validate_certs: false
-    force: yes
+    force: true
     timeout: 120
-    use_proxy: no
+    use_proxy: false
     #url_username: "{{ artifactory_user }}"
     #url_password: "{{ artifactory_password }}"
     # basic_auth: yes
@@ -73,15 +75,14 @@
   environment:
     no_proxy: '*'
 
-
-- name: Install Docker and Related RPM Packages
-  become: true
+# After unarchived to /tmp/ let yum/dnf install the docker rpms
+- name: Install Docker and Related RPM Packages from /tmp dir
   ansible.builtin.package:
     name: "{{ package_installs }}"
   register: docker_install
 
+# Group created so current user is allowed to use docker commands
 - name: Create docker group
-  become: true
   ansible.builtin.group:
     local: true
     name: docker
@@ -101,6 +102,7 @@
     daemon_reload: yes
   when: docker_install is changed
 
+# Remove the files we downloaded and unarchived
 - name: Remove rpm files and archive from tmp
   ansible.builtin.file:
     path: "/tmp/{{ item }}"
@@ -108,6 +110,7 @@
   with_items:
     - "{{ docker_rpms_unarchived.files }}"
     - "{{ docker_arch_dest_path }}"
+
 
 - name: Confirm Docker Installed and Version
   ansible.builtin.shell: "docker --version"
