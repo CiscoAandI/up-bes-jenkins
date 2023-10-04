@@ -6,8 +6,8 @@ Installs Docker on a RHEL host for use as Jenkins worker node within the BEaaS e
 Requirements
 ------------
 
-Ansible >=2.15.4
-Python >=3.9
+- Ansible >=2.15.4
+- Python >=3.9
 
 Role Variables
 --------------
