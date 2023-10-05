@@ -98,12 +98,6 @@
     name: docker
     state: present
 
-- name: "Create user {{ ansible_user }} on {{ inventory_hostname }} and add to docker group"
-  ansible.builtin.user:
-    name: "{{ ansible_user }}"
-    groups: docker
-    append: yes
-
 - name: Start and Enable the Docker service
   ansible.builtin.service:
     name: docker
