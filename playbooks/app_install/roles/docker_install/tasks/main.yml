@@ -19,10 +19,11 @@
     - /opt/containerd
     - /etc/docker
 
-- name: Import GPG key
-  ansible.builtin.rpm_key:
-    state: present
-    key: https://download.docker.com/linux/centos/gpg
+# This won't work since it can't call outside the network
+# - name: Import GPG key
+#   ansible.builtin.rpm_key:
+#     state: present
+#     key: https://download.docker.com/linux/centos/gpg
 
 - name: Set Fact for path to docker rpms gz file When pulling from Controller
   ansible.builtin.set_fact:
