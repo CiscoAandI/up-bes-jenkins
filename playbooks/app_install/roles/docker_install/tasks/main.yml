@@ -121,19 +121,6 @@
     - "{{ docker_rpms_unarchived.files }}"
     - "{{ docker_arch_dest_path }}"
 
-- name: Update APT sources.list
-  tasks:
-    - name: Replace/Copy sources.list
-      ansible.builtin.copy:
-        content: |
-          deb [arch=amd64] https://rtp-linux.cisco.com/ubuntu/ focal-updates main
-          deb [arch=amd64] https://rtp-linux.cisco.com/ubuntu/ focal-proposed main
-          deb [arch=amd64] https://rtp-linux.cisco.com/ubuntu/ focal-updates multiverse
-          deb [arch=amd64] https://rtp-linux.cisco.com/ubuntu/ focal-proposed multiverse
-          deb [arch=amd64] https://rtp-linux.cisco.com/ubuntu/ focal-updates universe
-          deb [arch=amd64] https://rtp-linux.cisco.com/ubuntu/ focal-proposed universe
-        dest: /etc/apt/sources.list
-
 - name: Confirm Docker Installed and Version
   ansible.builtin.shell: "docker --version"
   register: docker_version_check
