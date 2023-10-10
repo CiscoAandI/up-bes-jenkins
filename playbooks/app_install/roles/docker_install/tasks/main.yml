@@ -98,6 +98,12 @@
     name: docker
     state: present
 
+- name: Add Jenkins user to the Docker group
+  ansible.builtin.user:
+    name: jenkins
+    groups: docker
+    append: yes
+
 - name: Start and Enable the Docker service
   ansible.builtin.service:
     name: docker
