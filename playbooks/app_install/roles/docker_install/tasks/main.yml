@@ -43,13 +43,14 @@
     state: directory
     mode: 750
 
-- name: Touch /etc/docker/daemon.json if it doesnt exist or update mod time
-  ansible.builtin.file:
+- name: Configure Docker to use custom data directory
+  lineinfile:
     path: /etc/docker/daemon.json
-    state: touch
-    mode: 740
-    modification_time: preserve
-    access_time: preserve
+    create: yes
+    line: |
+      {
+        "data-root": "{{ docker_data_dir }}"
+      }
 
 - name: Download docker_arch_path to the /tmp/ dir using no auth and no proxy
   ansible.builtin.get_url:

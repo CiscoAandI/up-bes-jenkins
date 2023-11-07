@@ -4,7 +4,8 @@ docker_version: 24.0.6
 # Whether to retrieve from artifactory to push to target
 # or push from the controller to the target when set local
 docker_rpm_src: artifactory
-artifact_path:  "https://engci-maven-master.cisco.com/artifactory/cmsp-sapphire-development-group/up-sac-utils/jenkins/v1/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.gz"
+docker_data_dir: "/jenkins/docker"
+artifact_path: "https://engci-maven-master.cisco.com/artifactory/cmsp-sapphire-development-group/up-sac-utils/jenkins/v1/docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.gz"
 docker_rpm_filename: "docker-ce-{{ docker_version | default('24.0.6') }}-rpms.tar.gz"
 # Which packages should be cleared out before installing docker
 package_removals:
