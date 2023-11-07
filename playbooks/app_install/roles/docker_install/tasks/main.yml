@@ -41,10 +41,10 @@
   ansible.builtin.file:
     path: /etc/docker
     state: directory
-    mode: 750
+    mode: 755
 
 - name: Configure Docker to use custom data directory
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/docker/daemon.json
     create: yes
     line: |
