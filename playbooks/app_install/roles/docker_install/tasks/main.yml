@@ -43,14 +43,14 @@
     state: directory
     mode: 755
 
-- name: Configure Docker to use custom data directory
-  ansible.builtin.lineinfile:
-    path: /etc/docker/daemon.json
-    create: yes
-    line: |
-      {
-        "data-root": "{{ docker_data_dir }}"
-      }
+- name: Set Fact for docker data dir
+  ansible.builtin.set_fact:
+    "data_root": "{{ docker_data_dir }}"
+
+- name: Echo composed fact to /etc/docker/daemon.json using shell
+  ansible.builtin.shell: |
+    echo "{\"data-root\": \"{{ data_root }}\"}" > /etc/docker/daemon.json
+  when: data_root is defined
 
 - name: Download docker_arch_path to the /tmp/ dir using no auth and no proxy
   ansible.builtin.get_url:
