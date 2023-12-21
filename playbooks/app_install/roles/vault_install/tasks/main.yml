@@ -1,0 +1,29 @@
+---
+- name: Download HashiCorp Vault ZIP
+  get_url:
+    url: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
+    dest: "/tmp/vault_{{ vault_version }}_linux_amd64.zip"
+
+- name: Extract HashiCorp Vault
+  ansible.builtin.unarchive:
+    src: "/tmp/vault_{{ vault_version }}_linux_amd64.zip"
+    dest: "/tmp/"
+
+- name: Ensure /usr/local/bin directory exists
+  ansible.builtin.file:
+    path: "/usr/local/bin"
+    state: directory
+
+- name: Install HashiCorp Vault
+  ansible.builtin.copy:
+    src: "/tmp/vault"
+    dest: "/usr/local/bin/vault"
+    mode: '0755'
+
+- name: Remove the original file
+  ansible.builtin.file:
+    path: "/tmp/vault"
+    state: absent
+
+- name: Confirm Vault Installed and Version
+  ansible.builtin.shell: "vault --version"
