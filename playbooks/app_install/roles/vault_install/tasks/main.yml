@@ -1,7 +1,7 @@
 ---
 - name: Download HashiCorp Vault ZIP
   get_url:
-    url: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
+    url: "https://engci-maven-master.cisco.com/artifactory/cmsp-sapphire-development-release/up-sac-utils/jenkins/v1/vault_1.15.4_linux_amd64.zip"
     dest: "/tmp/vault_{{ vault_version }}_linux_amd64.zip"
 
 - name: Extract HashiCorp Vault

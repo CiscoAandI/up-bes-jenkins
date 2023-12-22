@@ -1,7 +1,7 @@
 vault_install
 =========
 
-Installs Docker on a RHEL host for use as Jenkins worker node within the BEaaS environment.
+Installs hasicorp vault on a RHEL host for use as Jenkins worker node within the BEaaS environment.
 
 Requirements
 ------------
