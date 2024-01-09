@@ -99,9 +99,9 @@
     name: docker
     state: present
 
-- name: Add the BES user to the Docker group
+- name: Add the jenkins user to the Docker group
   ansible.builtin.user:
-    name: dascode
+    name: jenkins
     groups: docker
     append: yes
 
