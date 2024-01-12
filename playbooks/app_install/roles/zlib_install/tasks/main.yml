@@ -1,0 +1,5 @@
+---
+  - name: Install zlib rpm package from url
+    yum:
+      name: 'https://engci-maven-master.cisco.com/artifactory/cmsp-sapphire-development-release/up-sac-utils/jenkins/v1/zlib-1.2.11-21.el8.x86_64.rpm'
+      state: present
