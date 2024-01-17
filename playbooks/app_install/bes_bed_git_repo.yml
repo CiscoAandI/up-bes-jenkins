@@ -16,3 +16,4 @@
     - print_HelloWorld
     - vault_install
     - zlib_install
+    - codesign_install
