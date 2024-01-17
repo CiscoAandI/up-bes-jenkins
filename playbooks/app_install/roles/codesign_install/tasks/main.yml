@@ -1,14 +1,13 @@
 ---
-  - name: Ensure directory exists
-      file:
-        path: '/home/jenkins/bin'
-        state: directory
-        owner: 'jenkins'
-        group: 'jenkins'
-        mode: '0755'
-
-    - name: Checkout code
-      git:
-        repo: 'https://wwwin-github.cisco.com/STO-Image-Signing/container_signing.git'
-        dest: '/home/jenkins/bin'
-        version: 'master'
+- name: Ensure directory exists
+  file:
+    path: '/home/jenkins/bin'
+    state: directory
+    owner: 'jenkins'
+    group: 'jenkins'
+    mode: '0755'  
+- name: Checkout code
+  git:
+    repo: 'https://wwwin-github.cisco.com/STO-Image-Signing/container_signing.git'
+    dest: '/home/jenkins/bin'
+    version: 'master'
