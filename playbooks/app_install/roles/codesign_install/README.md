@@ -11,4 +11,4 @@ Requirements
 
 Role Variables
 --------------
-In the vars/main.yml file you may set the version of codesign to install
+In the vars/main.yml file you may set the version of codesign and verification scripts to install
