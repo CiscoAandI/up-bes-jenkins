@@ -1,13 +1,26 @@
 ---
-- name: Ensure directory exists
+- name: Ensure swims_clients directory exists under $HOME
   file:
-    path: '/home/jenkins/bin'
+    path: '/home/jenkins/swims_clients'
     state: directory
     owner: 'jenkins'
     group: 'jenkins'
     mode: '0755'  
-- name: Checkout code
+- name: Checkout swims clients signing binaries
   git:
     repo: 'https://wwwin-github.cisco.com/STO-Image-Signing/container_signing.git'
-    dest: '/home/jenkins/bin'
+    dest: '/home/jenkins/swims_clients'
+    version: 'master'
+
+- name: Ensure verification_scripts directory exists under $HOME
+  file:
+    path: '/home/jenkins/verification_scripts'
+    state: directory
+    owner: 'jenkins'
+    group: 'jenkins'
+    mode: '0755'
+- name: Checkout verification scripts
+  git:
+    repo: 'https://wwwin-github.cisco.com/STO-Image-Signing/signature-file-verification.git'
+    dest: '/home/jenkins/verification_scripts'
     version: 'master'
