@@ -25,6 +25,6 @@
     dest: '/home/jenkins/verification_scripts'
     version: 'master'
 - name: Install cosgin version 2.2.2 rpm
-      yum:
-        name:'https://engci-maven.cisco.com/artifactory/cmsp-sapphire-development-group/up-sac-utils/jenkins/v1/cosign-2.2.2-1.aarch64.rpm'
-        state: present
+  yum:
+    name:'https://engci-maven.cisco.com/artifactory/cmsp-sapphire-development-group/up-sac-utils/jenkins/v1/cosign-2.2.2-1.aarch64.rpm'
+    state: present
