@@ -28,3 +28,4 @@
   yum:
     name: 'https://engci-maven-master.cisco.com/artifactory/cmsp-sapphire-development-group/up-sac-utils/jenkins/v1/cosign-2.2.2-1.x86_64.rpm'
     state: present
+    disable_gpg_check: yes
