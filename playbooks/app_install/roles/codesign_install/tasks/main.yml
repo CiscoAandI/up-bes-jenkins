@@ -10,7 +10,7 @@
   git:
     repo: 'https://wwwin-github.cisco.com/STO-Image-Signing/container_signing.git'
     dest: '/home/jenkins/swims_clients'
-    version: 'master'
+    version: 'pre_production'
 
 - name: Ensure verification_scripts directory exists under $HOME
   file:
