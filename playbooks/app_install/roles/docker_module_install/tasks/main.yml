@@ -1,0 +1,9 @@
+---
+- name: Download Docker SDK from URL
+  ansible.builtin.get_url:
+      url: https://engci-maven-master.cisco.com/artifactory/cmsp-sapphire-development-group/up-sac-utils/jenkins/v1/docker-5.0.3-py2.py3-none-any.whl
+      dest: /tmp/docker-5.0.3-py2.py3-none-any.whl
+- name: Install Docker module for Python using the local wheel file
+  ansible.builtin.pip:
+      name: /tmp/docker-5.0.3-py2.py3-none-any.whl
+      state: present

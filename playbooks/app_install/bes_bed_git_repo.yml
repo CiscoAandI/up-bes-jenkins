@@ -17,3 +17,4 @@
     - vault_install
     - zlib_install
     - codesign_install
+    - docker_module_install
